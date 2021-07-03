@@ -35,7 +35,7 @@ nb_path: "00_core.ipynb"
 <pre>in DF Meta __new__
 BaseFrame
 (&lt;class &#39;pydantic.main.BaseModel&#39;&gt;, &lt;class &#39;pydantic_pandas.core.PandasDataFrame&#39;&gt;)
-{&#39;__module__&#39;: &#39;pydantic_pandas.core&#39;, &#39;__qualname__&#39;: &#39;BaseFrame&#39;, &#39;__doc__&#39;: &#39;Doc from BaseFame&#39;, &#39;__init__&#39;: &lt;function BaseFrame.__init__ at 0x7ff04d9d1b00&gt;, &#39;_base_frame_root_validator&#39;: &lt;classmethod object at 0x7ff04d9d60d0&gt;, &#39;__classcell__&#39;: &lt;cell at 0x7ff04d9cbfd0: empty&gt;}
+{&#39;__module__&#39;: &#39;pydantic_pandas.core&#39;, &#39;__qualname__&#39;: &#39;BaseFrame&#39;, &#39;__doc__&#39;: &#39;Doc from BaseFame&#39;, &#39;__init__&#39;: &lt;function BaseFrame.__init__ at 0x7fe09430cb00&gt;, &#39;_base_frame_root_validator&#39;: &lt;classmethod object at 0x7fe094310110&gt;, &#39;__classcell__&#39;: &lt;cell at 0x7fe094310050: empty&gt;}
 </pre>
 </div>
 </div>
@@ -57,7 +57,7 @@ BaseFrame
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="TypedArray" class="doc_header"><code>class</code> <code>TypedArray</code><a href="https://github.com/humble chuck/pydantic_pandas/tree/main/pydantic_pandas/core.py#L19" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TypedArray</code>(<strong><code>data</code></strong>=<em><code>None</code></em>, <strong><code>index</code></strong>=<em><code>None</code></em>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>=<em><code>None</code></em>, <strong><code>copy</code></strong>=<em><code>False</code></em>, <strong><code>fastpath</code></strong>=<em><code>False</code></em>) :: <code>Series</code></p>
+<h2 id="TypedArray" class="doc_header"><code>class</code> <code>TypedArray</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/main/pydantic_pandas/core.py#L19" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TypedArray</code>(<strong><code>data</code></strong>=<em><code>None</code></em>, <strong><code>index</code></strong>=<em><code>None</code></em>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>=<em><code>None</code></em>, <strong><code>copy</code></strong>=<em><code>False</code></em>, <strong><code>fastpath</code></strong>=<em><code>False</code></em>) :: <code>Series</code></p>
 </blockquote>
 <p>One-dimensional ndarray with axis labels (including time series).</p>
 <p>Labels need not be unique but must be a hashable type. The object
@@ -133,7 +133,7 @@ get all NaN as a result.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ArrayMeta" class="doc_header"><code>class</code> <code>ArrayMeta</code><a href="https://github.com/humble chuck/pydantic_pandas/tree/main/pydantic_pandas/core.py#L37" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ArrayMeta</code>() :: <code>type</code></p>
+<h2 id="ArrayMeta" class="doc_header"><code>class</code> <code>ArrayMeta</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/main/pydantic_pandas/core.py#L37" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ArrayMeta</code>() :: <code>type</code></p>
 </blockquote>
 <p>type(object_or_name, bases, dict)
 type(object) -&gt; the object's type
@@ -160,7 +160,7 @@ type(name, bases, dict) -&gt; a new type</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Array" class="doc_header"><code>class</code> <code>Array</code><a href="https://github.com/humble chuck/pydantic_pandas/tree/main/pydantic_pandas/core.py#L41" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Array</code>(<strong><code>data</code></strong>=<em><code>None</code></em>, <strong><code>index</code></strong>=<em><code>None</code></em>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>=<em><code>None</code></em>, <strong><code>copy</code></strong>=<em><code>False</code></em>, <strong><code>fastpath</code></strong>=<em><code>False</code></em>) :: <code>Series</code></p>
+<h2 id="Array" class="doc_header"><code>class</code> <code>Array</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/main/pydantic_pandas/core.py#L41" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Array</code>(<strong><code>data</code></strong>=<em><code>None</code></em>, <strong><code>index</code></strong>=<em><code>None</code></em>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>=<em><code>None</code></em>, <strong><code>copy</code></strong>=<em><code>False</code></em>, <strong><code>fastpath</code></strong>=<em><code>False</code></em>) :: <code>Series</code></p>
 </blockquote>
 <p>One-dimensional ndarray with axis labels (including time series).</p>
 <p>Labels need not be unique but must be a hashable type. The object
@@ -236,7 +236,7 @@ get all NaN as a result.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="conarray" class="doc_header"><code>conarray</code><a href="https://github.com/humble chuck/pydantic_pandas/tree/main/pydantic_pandas/core.py#L44" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>conarray</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="conarray" class="doc_header"><code>conarray</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/main/pydantic_pandas/core.py#L44" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>conarray</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -267,7 +267,7 @@ get all NaN as a result.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasDataFrame" class="doc_header"><code>class</code> <code>PandasDataFrame</code><a href="https://github.com/humble chuck/pydantic_pandas/tree/main/pydantic_pandas/core.py#L50" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasDataFrame</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>DataFrame</code></p>
+<h2 id="PandasDataFrame" class="doc_header"><code>class</code> <code>PandasDataFrame</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/main/pydantic_pandas/core.py#L50" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasDataFrame</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>DataFrame</code></p>
 </blockquote>
 <p>Pandas DataFrame Validation</p>
 
@@ -299,7 +299,7 @@ get all NaN as a result.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="DataFrameModelMetaclass" class="doc_header"><code>class</code> <code>DataFrameModelMetaclass</code><a href="https://github.com/humble chuck/pydantic_pandas/tree/main/pydantic_pandas/core.py#L94" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DataFrameModelMetaclass</code>(<strong><code>name</code></strong>, <strong><code>bases</code></strong>, <strong><code>dct</code></strong>) :: <code>ModelMetaclass</code></p>
+<h2 id="DataFrameModelMetaclass" class="doc_header"><code>class</code> <code>DataFrameModelMetaclass</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/main/pydantic_pandas/core.py#L94" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DataFrameModelMetaclass</code>(<strong><code>name</code></strong>, <strong><code>bases</code></strong>, <strong><code>dct</code></strong>) :: <code>ModelMetaclass</code></p>
 </blockquote>
 <p>Metaclass for defining Abstract Base Classes (ABCs).</p>
 <p>Use this metaclass to create an ABC.  An ABC can be subclassed
@@ -333,7 +333,7 @@ even via super()).</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="BaseFrame" class="doc_header"><code>class</code> <code>BaseFrame</code><a href="https://github.com/humble chuck/pydantic_pandas/tree/main/pydantic_pandas/core.py#L123" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BaseFrame</code>(<strong>*<code>args</code></strong>) :: <code>BaseModel</code></p>
+<h2 id="BaseFrame" class="doc_header"><code>class</code> <code>BaseFrame</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/main/pydantic_pandas/core.py#L123" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BaseFrame</code>(<strong>*<code>args</code></strong>) :: <code>BaseModel</code></p>
 </blockquote>
 <p>Doc from BaseFame</p>
 
