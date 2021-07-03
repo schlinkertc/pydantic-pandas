@@ -18,6 +18,6 @@ modules = ["core.py",
 
 doc_url = "https://schlinkertc.github.io/pydantic_pandas/"
 
-git_url = "https://github.com/schlinkertc/pydantic_pandas/tree/main/"
+git_url = "https://github.com/schlinkertc/pydantic_pandas/tree/master/"
 
 def custom_doc_links(name): return None
