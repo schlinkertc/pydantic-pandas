@@ -16,7 +16,7 @@ modules = ["core.py",
            "utils.py",
            "default_standard_lib.py"]
 
-doc_url = "https://schlinkertc.github.io/pydantic_pandas/"
+doc_url = "https://schlinkertc.github.io/pydantic-pandas/"
 
 git_url = "https://github.com/schlinkertc/pydantic_pandas/tree/master/"
 
