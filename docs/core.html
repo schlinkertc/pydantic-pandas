@@ -26,26 +26,23 @@ nb_path: "00_core.ipynb"
     
 <div class="cell border-box-sizing code_cell rendered">
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>in DF Meta __new__
-BaseFrame
-(&lt;class &#39;pydantic.main.BaseModel&#39;&gt;, &lt;class &#39;pydantic_pandas.core.PandasDataFrame&#39;&gt;)
-{&#39;__module__&#39;: &#39;pydantic_pandas.core&#39;, &#39;__qualname__&#39;: &#39;BaseFrame&#39;, &#39;__doc__&#39;: &#39;Doc from BaseFame&#39;, &#39;__init__&#39;: &lt;function BaseFrame.__init__ at 0x7fb1738ccb00&gt;, &#39;_base_frame_root_validator&#39;: &lt;classmethod object at 0x7fb1738d11d0&gt;, &#39;__classcell__&#39;: &lt;cell at 0x7fb1738d1110: empty&gt;}
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="DataFrame">DataFrame<a class="anchor-link" href="#DataFrame"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<blockquote><p>subclass Pandas DataFrame to make it play nicely with pydantic</p>
+</blockquote>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -57,60 +54,85 @@ BaseFrame
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="TypedArray" class="doc_header"><code>class</code> <code>TypedArray</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L19" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TypedArray</code>(<strong><code>data</code></strong>=<em><code>None</code></em>, <strong><code>index</code></strong>=<em><code>None</code></em>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>=<em><code>None</code></em>, <strong><code>copy</code></strong>=<em><code>False</code></em>, <strong><code>fastpath</code></strong>=<em><code>False</code></em>) :: <code>Series</code></p>
+<h2 id="DataFrame" class="doc_header"><code>class</code> <code>DataFrame</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L24" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DataFrame</code>(<strong><code>data</code></strong>=<em><code>None</code></em>, <strong><code>index</code></strong>:<code>Optional[Axes]</code>=<em><code>None</code></em>, <strong><code>columns</code></strong>:<code>Optional[Axes]</code>=<em><code>None</code></em>, <strong><code>dtype</code></strong>:<code>Optional[Dtype]</code>=<em><code>None</code></em>, <strong><code>copy</code></strong>:<code>bool</code>=<em><code>False</code></em>) :: <a href="/pydantic-pandas/core.html#DataFrame"><code>DataFrame</code></a></p>
 </blockquote>
-<p>One-dimensional ndarray with axis labels (including time series).</p>
-<p>Labels need not be unique but must be a hashable type. The object
-supports both integer- and label-based indexing and provides a host of
-methods for performing operations involving the index. Statistical
-methods from ndarray have been overridden to automatically exclude
-missing data (currently represented as NaN).</p>
-<p>Operations between Series (+, -, /, *, **) align values based on their
-associated index values-- they need not be the same length. The result
-index will be the sorted union of the two indexes.</p>
-<h2 id="Parameters">Parameters<a class="anchor-link" href="#Parameters"> </a></h2><p>data : array-like, Iterable, dict, or scalar value
-    Contains data stored in Series. If data is a dict, argument order is
-    maintained.
-index : array-like or Index (1d)
-    Values must be hashable and have the same length as <code>data</code>.
-    Non-unique index values are allowed. Will default to
-    RangeIndex (0, 1, 2, ..., n) if not provided. If data is dict-like
-    and index is None, then the keys in the data are used as the index. If the
-    index is not None, the resulting Series is reindexed with the index values.
-dtype : str, numpy.dtype, or ExtensionDtype, optional
-    Data type for the output Series. If not specified, this will be
-    inferred from <code>data</code>.
-    See the :ref:<code>user guide &lt;basics.dtypes&gt;</code> for more usages.
-name : str, optional
-    The name to give to the Series.
+<p>Two-dimensional, size-mutable, potentially heterogeneous tabular data.</p>
+<p>Data structure also contains labeled axes (rows and columns).
+Arithmetic operations align on both row and column labels. Can be
+thought of as a dict-like container for Series objects. The primary
+pandas data structure.</p>
+<h2 id="Parameters">Parameters<a class="anchor-link" href="#Parameters"> </a></h2><p>data : ndarray (structured or homogeneous), Iterable, dict, or DataFrame
+    Dict can contain Series, arrays, constants, dataclass or list-like objects. If
+    data is a dict, column order follows insertion-order.</p>
+
+<pre><code>.. versionchanged:: 0.25.0
+   If data is a list of dicts, column order follows insertion-order.
+
+</code></pre>
+<p>index : Index or array-like
+    Index to use for resulting frame. Will default to RangeIndex if
+    no indexing information part of input data and no index provided.
+columns : Index or array-like
+    Column labels to use for resulting frame. Will default to
+    RangeIndex (0, 1, 2, ..., n) if no column labels are provided.
+dtype : dtype, default None
+    Data type to force. Only a single dtype is allowed. If None, infer.
 copy : bool, default False
-    Copy input data.</p>
-<h2 id="Examples">Examples<a class="anchor-link" href="#Examples"> </a></h2><p>Constructing Series from a dictionary with an Index specified</p>
-<blockquote><blockquote><blockquote><p>d = {'a': 1, 'b': 2, 'c': 3}
-ser = pd.Series(data=d, index=['a', 'b', 'c'])
-ser
-a   1
-b   2
-c   3
-dtype: int64</p>
+    Copy data from inputs. Only affects DataFrame / 2d ndarray input.</p>
+<h2 id="See-Also">See Also<a class="anchor-link" href="#See-Also"> </a></h2><p>DataFrame.from_records : Constructor from tuples, also record arrays.
+DataFrame.from_dict : From dicts of Series, arrays, or dicts.
+read_csv : Read a comma-separated values (csv) file into DataFrame.
+read_table : Read general delimited file into DataFrame.
+read_clipboard : Read text from clipboard into DataFrame.</p>
+<h2 id="Examples">Examples<a class="anchor-link" href="#Examples"> </a></h2><p>Constructing DataFrame from a dictionary.</p>
+<blockquote><blockquote><blockquote><p>d = {'col1': [1, 2], 'col2': [3, 4]}
+df = pd.DataFrame(data=d)
+df
+   col1  col2
+0     1     3
+1     2     4</p>
 </blockquote>
 </blockquote>
 </blockquote>
-<p>The keys of the dictionary match with the Index values, hence the Index
-values have no effect.</p>
-<blockquote><blockquote><blockquote><p>d = {'a': 1, 'b': 2, 'c': 3}
-ser = pd.Series(data=d, index=['x', 'y', 'z'])
-ser
-x   NaN
-y   NaN
-z   NaN
-dtype: float64</p>
+<p>Notice that the inferred dtype is int64.</p>
+<blockquote><blockquote><blockquote><p>df.dtypes
+col1    int64
+col2    int64
+dtype: object</p>
 </blockquote>
 </blockquote>
 </blockquote>
-<p>Note that the Index is first build with the keys from the dictionary.
-After this the Series is reindexed with the given Index values, hence we
-get all NaN as a result.</p>
+<p>To enforce a single dtype:</p>
+<blockquote><blockquote><blockquote><p>df = pd.DataFrame(data=d, dtype=np.int8)
+df.dtypes
+col1    int8
+col2    int8
+dtype: object</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Constructing DataFrame from numpy ndarray:</p>
+<blockquote><blockquote><blockquote><p>df2 = pd.DataFrame(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
+...                    columns=['a', 'b', 'c'])
+df2
+   a  b  c
+0  1  2  3
+1  4  5  6
+2  7  8  9</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Constructing DataFrame from dataclass:</p>
+<blockquote><blockquote><blockquote><p>from dataclasses import make_dataclass
+Point = make_dataclass("Point", [("x", int), ("y", int)])
+pd.DataFrame([Point(0, 0), Point(0, 3), Point(2, 3)])
+    x  y
+0  0  0
+1  0  3
+2  2  3</p>
+</blockquote>
+</blockquote>
+</blockquote>
 
 </div>
 
@@ -122,6 +144,30 @@ get all NaN as a result.</p>
 </div>
     {% endraw %}
 
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Base-Model">Base Model<a class="anchor-link" href="#Base-Model"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<blockquote><ul>
+<li><code>_repr_json_</code> for Jupyter display</li>
+<li>json encoders for DataFrame, Array</li>
+</ul>
+</blockquote>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -133,110 +179,7 @@ get all NaN as a result.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ArrayMeta" class="doc_header"><code>class</code> <code>ArrayMeta</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L37" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ArrayMeta</code>() :: <code>type</code></p>
-</blockquote>
-<p>type(object_or_name, bases, dict)
-type(object) -&gt; the object's type
-type(name, bases, dict) -&gt; a new type</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="Array" class="doc_header"><code>class</code> <code>Array</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L41" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Array</code>(<strong><code>data</code></strong>=<em><code>None</code></em>, <strong><code>index</code></strong>=<em><code>None</code></em>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>=<em><code>None</code></em>, <strong><code>copy</code></strong>=<em><code>False</code></em>, <strong><code>fastpath</code></strong>=<em><code>False</code></em>) :: <code>Series</code></p>
-</blockquote>
-<p>One-dimensional ndarray with axis labels (including time series).</p>
-<p>Labels need not be unique but must be a hashable type. The object
-supports both integer- and label-based indexing and provides a host of
-methods for performing operations involving the index. Statistical
-methods from ndarray have been overridden to automatically exclude
-missing data (currently represented as NaN).</p>
-<p>Operations between Series (+, -, /, *, **) align values based on their
-associated index values-- they need not be the same length. The result
-index will be the sorted union of the two indexes.</p>
-<h2 id="Parameters">Parameters<a class="anchor-link" href="#Parameters"> </a></h2><p>data : array-like, Iterable, dict, or scalar value
-    Contains data stored in Series. If data is a dict, argument order is
-    maintained.
-index : array-like or Index (1d)
-    Values must be hashable and have the same length as <code>data</code>.
-    Non-unique index values are allowed. Will default to
-    RangeIndex (0, 1, 2, ..., n) if not provided. If data is dict-like
-    and index is None, then the keys in the data are used as the index. If the
-    index is not None, the resulting Series is reindexed with the index values.
-dtype : str, numpy.dtype, or ExtensionDtype, optional
-    Data type for the output Series. If not specified, this will be
-    inferred from <code>data</code>.
-    See the :ref:<code>user guide &lt;basics.dtypes&gt;</code> for more usages.
-name : str, optional
-    The name to give to the Series.
-copy : bool, default False
-    Copy input data.</p>
-<h2 id="Examples">Examples<a class="anchor-link" href="#Examples"> </a></h2><p>Constructing Series from a dictionary with an Index specified</p>
-<blockquote><blockquote><blockquote><p>d = {'a': 1, 'b': 2, 'c': 3}
-ser = pd.Series(data=d, index=['a', 'b', 'c'])
-ser
-a   1
-b   2
-c   3
-dtype: int64</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>The keys of the dictionary match with the Index values, hence the Index
-values have no effect.</p>
-<blockquote><blockquote><blockquote><p>d = {'a': 1, 'b': 2, 'c': 3}
-ser = pd.Series(data=d, index=['x', 'y', 'z'])
-ser
-x   NaN
-y   NaN
-z   NaN
-dtype: float64</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>Note that the Index is first build with the keys from the dictionary.
-After this the Series is reindexed with the given Index values, hence we
-get all NaN as a result.</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="conarray" class="doc_header"><code>conarray</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L44" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>conarray</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h2 id="BaseModel" class="doc_header"><code>class</code> <code>BaseModel</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L40" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BaseModel</code>() :: <a href="/pydantic-pandas/core.html#BaseModel"><code>BaseModel</code></a></p>
 </blockquote>
 
 </div>
@@ -256,121 +199,12 @@ get all NaN as a result.</p>
 </div>
     {% endraw %}
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasDataFrame" class="doc_header"><code>class</code> <code>PandasDataFrame</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L50" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasDataFrame</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>DataFrame</code></p>
-</blockquote>
-<p>Pandas DataFrame Validation</p>
-
-</div>
-
-</div>
-
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Regular-Model">Regular Model<a class="anchor-link" href="#Regular-Model"> </a></h4>
 </div>
 </div>
-
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="DataFrameModelMetaclass" class="doc_header"><code>class</code> <code>DataFrameModelMetaclass</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L94" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DataFrameModelMetaclass</code>(<strong><code>name</code></strong>, <strong><code>bases</code></strong>, <strong><code>dct</code></strong>) :: <code>ModelMetaclass</code></p>
-</blockquote>
-<p>Metaclass for defining Abstract Base Classes (ABCs).</p>
-<p>Use this metaclass to create an ABC.  An ABC can be subclassed
-directly, and then acts as a mix-in class.  You can also register
-unrelated concrete classes (even built-in classes) and unrelated
-ABCs as 'virtual subclasses' -- these and their descendants will
-be considered subclasses of the registering ABC by the built-in
-issubclass() function, but the registering ABC won't show up in
-their MRO (Method Resolution Order) nor will method
-implementations defined by the registering ABC be callable (not
-even via super()).</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="BaseFrame" class="doc_header"><code>class</code> <code>BaseFrame</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L123" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BaseFrame</code>(<strong>*<code>args</code></strong>) :: <code>BaseModel</code></p>
-</blockquote>
-<p>Doc from BaseFame</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>in DF Meta __new__
-BaseFrame
-(&lt;class &#39;pydantic.main.BaseModel&#39;&gt;, &lt;class &#39;__main__.PandasDataFrame&#39;&gt;)
-{&#39;__module__&#39;: &#39;__main__&#39;, &#39;__qualname__&#39;: &#39;BaseFrame&#39;, &#39;__doc__&#39;: &#39;Doc from BaseFame&#39;, &#39;__init__&#39;: &lt;function BaseFrame.__init__ at 0x7fbb2d226c20&gt;, &#39;_base_frame_root_validator&#39;: &lt;classmethod object at 0x7fbb2d230650&gt;, &#39;__classcell__&#39;: &lt;cell at 0x7fbb2d2304d0: empty&gt;}
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -378,32 +212,15 @@ BaseFrame
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">MovieModel</span><span class="p">(</span><span class="n">BaseFrame</span><span class="p">):</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">year</span><span class="p">:</span> <span class="nb">int</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">integer</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">string</span><span class="p">:</span> <span class="nb">str</span>
 </pre></div>
 
     </div>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>in DF Meta __new__
-MovieModel
-(&lt;class &#39;__main__.BaseFrame&#39;&gt;,)
-{&#39;__module__&#39;: &#39;__main__&#39;, &#39;__qualname__&#39;: &#39;MovieModel&#39;, &#39;__annotations__&#39;: {&#39;title&#39;: &lt;class &#39;__main__.ConstrainedArray&#39;&gt;, &#39;year&#39;: &lt;class &#39;__main__.ConstrainedArray&#39;&gt;}}
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -414,7 +231,7 @@ MovieModel
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">MovieModel</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Model</span><span class="p">(</span><span class="n">integer</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">string</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -429,7 +246,7 @@ MovieModel
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>__main__.MovieModel</pre>
+<pre>Model(integer=1, string=&#39;a&#39;)</pre>
 </div>
 
 </div>
@@ -440,6 +257,12 @@ MovieModel
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Model-with-a-DataFrame">Model with a DataFrame<a class="anchor-link" href="#Model-with-a-DataFrame"> </a></h4>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -447,27 +270,9 @@ MovieModel
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">movies</span> <span class="o">=</span> <span class="n">MovieModel</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Cocktail&#39;</span><span class="p">,</span><span class="s1">&#39;Cheers&#39;</span><span class="p">,</span><span class="s1">&#39;That Thing You Do!&#39;</span><span class="p">],</span>
-        <span class="n">year</span><span class="o">=</span><span class="p">[</span><span class="mi">1988</span><span class="p">,</span><span class="mi">1982</span><span class="p">,</span><span class="mi">1996</span><span class="p">]</span>
-    <span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span>
+<span class="n">Model</span><span class="p">(</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]}))</span>
 </pre></div>
 
     </div>
@@ -479,15 +284,15 @@ MovieModel
 
 <div class="output_area">
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>base frame init
-validating array
-[&#39;Cocktail&#39;, &#39;Cheers&#39;, &#39;That Thing You Do!&#39;]
-validating array
-[1988, 1982, 1996]
-In Base Frame Root validator
-</pre>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Model(df=   a
+0  1
+1  2
+2  3)</pre>
 </div>
+
 </div>
 
 </div>
@@ -503,7 +308,114 @@ In Base Frame Root validator
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">movies</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Model</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;title&#39;: &#39;Model&#39;,
+ &#39;type&#39;: &#39;object&#39;,
+ &#39;properties&#39;: {&#39;df&#39;: {&#39;title&#39;: &#39;Df&#39;, &#39;type&#39;: &#39;DataFrame&#39;}},
+ &#39;required&#39;: [&#39;df&#39;]}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="TypedArray">TypedArray<a class="anchor-link" href="#TypedArray"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">string</span><span class="p">:</span> <span class="n">ConstrainedArray</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">date</span><span class="p">:</span> <span class="n">ConstrainedArray</span><span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">]</span>
+    <span class="n">number</span><span class="p">:</span> <span class="n">ConstrainedArray</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span>
+    <span class="n">string</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="s1">&#39;c&#39;</span><span class="p">],</span>
+    <span class="n">number</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span>
+    <span class="n">date</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1994-06-01&#39;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">model</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Model(string=0    a
+1    b
+2    c
+dtype: object, date=0   1994-06-01
+dtype: datetime64[ns], number=0    1
+1    2
+2    3
+dtype: int64)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span>
 </pre></div>
 
     </div>
@@ -535,25 +447,212 @@ In Base Frame Root validator
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>title</th>
-      <th>year</th>
+      <th>string</th>
+      <th>date</th>
+      <th>number</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>Cocktail</td>
-      <td>1988</td>
+      <td>a</td>
+      <td>1994-06-01</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>Cheers</td>
-      <td>1982</td>
+      <td>b</td>
+      <td>NaT</td>
+      <td>2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>That Thing You Do!</td>
-      <td>1996</td>
+      <td>c</td>
+      <td>NaT</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Base-Frame-to-add-validation-to-the-whole-model">Base Frame to add validation to the whole model<a class="anchor-link" href="#Base-Frame-to-add-validation-to-the-whole-model"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="BaseFrame" class="doc_header"><code>class</code> <code>BaseFrame</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L106" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BaseFrame</code>(<strong><code>index</code></strong>:<code>Any</code>=<em><code>None</code></em>) :: <a href="/pydantic-pandas/core.html#BaseModel"><code>BaseModel</code></a></p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">Field</span>
+
+<span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseFrame</span><span class="p">):</span>
+    <span class="n">string</span><span class="p">:</span> <span class="n">ConstrainedArray</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+    <span class="n">date</span><span class="p">:</span> <span class="n">ConstrainedArray</span><span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;a required date field&#39;</span><span class="p">)</span>
+    <span class="n">number</span><span class="p">:</span> <span class="n">ConstrainedArray</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">],</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;1994-06-01&#39;</span><span class="p">,</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()],</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="What-about-Aliases?">What about Aliases?<a class="anchor-link" href="#What-about-Aliases?"> </a></h4>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseFrame</span><span class="p">):</span>
+    <span class="n">string</span><span class="p">:</span><span class="n">ConstrainedArray</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="s1">&#39;String Column&#39;</span><span class="p">)</span>
+    <span class="n">numbers</span><span class="p">:</span><span class="n">ConstrainedArray</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="s1">&#39;Number Column&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({</span>
+    <span class="s2">&quot;String Column&quot;</span><span class="p">:[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="s1">&#39;c&#39;</span><span class="p">],</span>
+    <span class="s2">&quot;Number Column&quot;</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="p">}</span>
+<span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">df</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>string</th>
+      <th>numbers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>a</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>b</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>c</td>
+      <td>3</td>
     </tr>
   </tbody>
 </table>
@@ -575,11 +674,8 @@ In Base Frame Root validator
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">MovieModel</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">movies</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">))</span>
-<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I wish this worked&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">df</span>
 </pre></div>
 
     </div>
@@ -588,115 +684,6 @@ In Base Frame Root validator
 
 <div class="output_wrapper">
 <div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>base frame init
-In Base Frame Root validator
-I wish this worked
-2 validation errors for MovieModel
-title
-  field required (type=value_error.missing)
-year
-  field required (type=value_error.missing)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="How-about-Sub-classing-?">How about Sub-classing ?<a class="anchor-link" href="#How-about-Sub-classing-?"> </a></h2>
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">DetailedMovieModel</span><span class="p">(</span><span class="n">MovieModel</span><span class="p">):</span>
-    <span class="n">review</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">stars</span><span class="p">:</span> <span class="nb">int</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>in DF Meta __new__
-DetailedMovieModel
-(&lt;class &#39;__main__.MovieModel&#39;&gt;,)
-{&#39;__module__&#39;: &#39;__main__&#39;, &#39;__qualname__&#39;: &#39;DetailedMovieModel&#39;, &#39;__annotations__&#39;: {&#39;review&#39;: &lt;class &#39;__main__.ConstrainedArray&#39;&gt;, &#39;stars&#39;: &lt;class &#39;__main__.ConstrainedArray&#39;&gt;}}
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">DetailedMovieModel</span><span class="p">(</span>
-    <span class="n">review</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Perfect&#39;</span><span class="p">,</span><span class="s1">&#39;Amazing&#39;</span><span class="p">,</span><span class="s1">&#39;The Best&#39;</span><span class="p">],</span>
-    <span class="n">stars</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span>
-    <span class="o">**</span><span class="n">movies</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span>
-        <span class="n">include</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">movies</span><span class="o">.</span><span class="n">__fields__</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-    <span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>base frame init
-validating array
-0              Cocktail
-1                Cheers
-2    That Thing You Do!
-dtype: object
-validating array
-0    1988
-1    1982
-2    1996
-dtype: int64
-validating array
-[&#39;Perfect&#39;, &#39;Amazing&#39;, &#39;The Best&#39;]
-validating array
-[10, 10, 10]
-In Base Frame Root validator
-</pre>
-</div>
-</div>
 
 <div class="output_area">
 
@@ -720,33 +707,1553 @@ In Base Frame Root validator
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>title</th>
-      <th>year</th>
-      <th>review</th>
-      <th>stars</th>
+      <th>index</th>
+      <th>String Column</th>
+      <th>Number Column</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>Cocktail</td>
-      <td>1988</td>
-      <td>Perfect</td>
-      <td>10</td>
+      <td>0</td>
+      <td>a</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>Cheers</td>
-      <td>1982</td>
-      <td>Amazing</td>
-      <td>10</td>
+      <td>1</td>
+      <td>b</td>
+      <td>2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>That Thing You Do!</td>
-      <td>1996</td>
-      <td>The Best</td>
-      <td>10</td>
+      <td>2</td>
+      <td>c</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Model</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Model(index={0: 0, 1: 1, 2: 2}, string={0: &#39;a&#39;, 1: &#39;b&#39;, 2: &#39;c&#39;}, numbers={0: 1, 1: 2, 2: 3})</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Validators">Validators<a class="anchor-link" href="#Validators"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">validator</span>
+
+<span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseFrame</span><span class="p">):</span>
+    <span class="n">numbers</span><span class="p">:</span> <span class="n">ConstrainedArray</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">fizz</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">buzz</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">fizz_buzz</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;fizz&#39;</span><span class="p">,</span><span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_is_fizz</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">values</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="s1">&#39;numbers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">%</span><span class="k">3</span>==0)
+    
+    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;buzz&#39;</span><span class="p">,</span><span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_is_buzz</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">values</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="s1">&#39;numbers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">%</span><span class="k">5</span>==0)
+    
+    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;fizz_buzz&#39;</span><span class="p">,</span><span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_is_fizz_buzz</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">values</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">values</span><span class="p">[</span><span class="s1">&#39;fizz&#39;</span><span class="p">],</span><span class="n">values</span><span class="p">[</span><span class="s1">&#39;buzz&#39;</span><span class="p">]])</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span>
+    
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">numbers</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span><span class="o">.</span><span class="n">df</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>numbers</th>
+      <th>fizz</th>
+      <th>buzz</th>
+      <th>fizz_buzz</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>numbers        15
+fizz         True
+buzz         True
+fizz_buzz    True
+Name: 14, dtype: object</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseFrame</span><span class="p">):</span>
+    <span class="n">numbers</span><span class="p">:</span> <span class="n">ConstrainedArray</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="nb">sum</span><span class="p">:</span> <span class="n">ConstrainedArray</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;sum&#39;</span><span class="p">,</span><span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">sum_numbers</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">values</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="s1">&#39;numbers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Model</span><span class="p">(</span><span class="n">numbers</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>numbers     6
+sum        18
+dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Delegate-pandas-functions-to-create-custom-fields">Delegate pandas functions to create custom fields<a class="anchor-link" href="#Delegate-pandas-functions-to-create-custom-fields"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pydantic_pandas.utils</span> <span class="kn">import</span> <span class="n">delegates</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">PandasDateTime</span><span class="p">():</span>
+    <span class="n">kwargs</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_to_datetime</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_to_datetime</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">array</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">PandasNumeric</span><span class="p">():</span>
+    <span class="n">kwargs</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_to_numeric</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_to_numeric</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">array</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@delegates</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">pandas_datetime</span><span class="p">(</span><span class="n">default_value</span><span class="o">=...</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;PandasDateTimeType&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">PandasDateTime</span><span class="p">,),</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span><span class="n">kwargs</span><span class="p">})</span>
+
+<span class="nd">@delegates</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">pandas_numeric</span><span class="p">(</span><span class="n">default_value</span><span class="o">=...</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;PandasNumericType&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">PandasNumeric</span><span class="p">,),</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span><span class="n">kwargs</span><span class="p">})</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseFrame</span><span class="p">):</span>
+    <span class="n">date</span><span class="p">:</span> <span class="n">pandas_datetime</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">numbers</span><span class="p">:</span> <span class="n">pandas_numeric</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Model</span><span class="p">(</span>
+    <span class="n">date</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1994-06-01&#39;</span><span class="p">,</span><span class="s1">&#39;error&#39;</span><span class="p">],</span>
+    <span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">9</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">e</span><span class="p">],</span>
+    <span class="n">other_numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">9</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">e</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Model(index={0: 0, 1: 1}, date={0: Timestamp(&#39;1994-06-01 00:00:00&#39;), 1: NaT}, numbers={0: 0.1111111111111111, 1: 2.718281828459045})</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Constrained-Frame">Constrained Frame<a class="anchor-link" href="#Constrained-Frame"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="TypedFrame" class="doc_header"><code>class</code> <code>TypedFrame</code><a href="https://github.com/schlinkertc/pydantic_pandas/tree/master/pydantic_pandas/core.py#L139" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TypedFrame</code>(<strong><code>data</code></strong>=<em><code>None</code></em>, <strong><code>index</code></strong>:<code>Optional[Axes]</code>=<em><code>None</code></em>, <strong><code>columns</code></strong>:<code>Optional[Axes]</code>=<em><code>None</code></em>, <strong><code>dtype</code></strong>:<code>Optional[Dtype]</code>=<em><code>None</code></em>, <strong><code>copy</code></strong>:<code>bool</code>=<em><code>False</code></em>) :: <a href="/pydantic-pandas/core.html#DataFrame"><code>DataFrame</code></a></p>
+</blockquote>
+<p>Two-dimensional, size-mutable, potentially heterogeneous tabular data.</p>
+<p>Data structure also contains labeled axes (rows and columns).
+Arithmetic operations align on both row and column labels. Can be
+thought of as a dict-like container for Series objects. The primary
+pandas data structure.</p>
+<h2 id="Parameters">Parameters<a class="anchor-link" href="#Parameters"> </a></h2><p>data : ndarray (structured or homogeneous), Iterable, dict, or DataFrame
+    Dict can contain Series, arrays, constants, dataclass or list-like objects. If
+    data is a dict, column order follows insertion-order.</p>
+
+<pre><code>.. versionchanged:: 0.25.0
+   If data is a list of dicts, column order follows insertion-order.
+
+</code></pre>
+<p>index : Index or array-like
+    Index to use for resulting frame. Will default to RangeIndex if
+    no indexing information part of input data and no index provided.
+columns : Index or array-like
+    Column labels to use for resulting frame. Will default to
+    RangeIndex (0, 1, 2, ..., n) if no column labels are provided.
+dtype : dtype, default None
+    Data type to force. Only a single dtype is allowed. If None, infer.
+copy : bool, default False
+    Copy data from inputs. Only affects DataFrame / 2d ndarray input.</p>
+<h2 id="See-Also">See Also<a class="anchor-link" href="#See-Also"> </a></h2><p>DataFrame.from_records : Constructor from tuples, also record arrays.
+DataFrame.from_dict : From dicts of Series, arrays, or dicts.
+read_csv : Read a comma-separated values (csv) file into DataFrame.
+read_table : Read general delimited file into DataFrame.
+read_clipboard : Read text from clipboard into DataFrame.</p>
+<h2 id="Examples">Examples<a class="anchor-link" href="#Examples"> </a></h2><p>Constructing DataFrame from a dictionary.</p>
+<blockquote><blockquote><blockquote><p>d = {'col1': [1, 2], 'col2': [3, 4]}
+df = pd.DataFrame(data=d)
+df
+   col1  col2
+0     1     3
+1     2     4</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Notice that the inferred dtype is int64.</p>
+<blockquote><blockquote><blockquote><p>df.dtypes
+col1    int64
+col2    int64
+dtype: object</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>To enforce a single dtype:</p>
+<blockquote><blockquote><blockquote><p>df = pd.DataFrame(data=d, dtype=np.int8)
+df.dtypes
+col1    int8
+col2    int8
+dtype: object</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Constructing DataFrame from numpy ndarray:</p>
+<blockquote><blockquote><blockquote><p>df2 = pd.DataFrame(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
+...                    columns=['a', 'b', 'c'])
+df2
+   a  b  c
+0  1  2  3
+1  4  5  6
+2  7  8  9</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Constructing DataFrame from dataclass:</p>
+<blockquote><blockquote><blockquote><p>from dataclasses import make_dataclass
+Point = make_dataclass("Point", [("x", int), ("y", int)])
+pd.DataFrame([Point(0, 0), Point(0, 3), Point(2, 3)])
+    x  y
+0  0  0
+1  0  3
+2  2  3</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <a href="/pydantic-pandas/core.html#conframe"><code>conframe</code></a> function will allow us to create a constrained frame type with multiple parameters. This pattern is lifted from Pydantic functions like "constr" and "confloat".</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-uses-for-ConstrainedFrame">Example uses for <a href="/pydantic-pandas/core.html#ConstrainedFrame"><code>ConstrainedFrame</code></a><a class="anchor-link" href="#Example-uses-for-ConstrainedFrame"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="DataFrames-as-Model-Attributes">DataFrames as Model Attributes<a class="anchor-link" href="#DataFrames-as-Model-Attributes"> </a></h4>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="s1">&#39;c&#39;</span><span class="p">],</span>
+     <span class="s2">&quot;value&quot;</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;3&#39;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Record</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">value</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">not_there</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="c1"># a dataframe that is validated using a row model</span>
+    <span class="n">validate_with_model</span><span class="p">:</span> <span class="n">ConstrainedFrame</span><span class="p">[</span><span class="n">Record</span><span class="p">]</span>
+    <span class="n">validate_with_columns</span><span class="p">:</span> <span class="n">ConstrainedFrame</span><span class="p">[</span><span class="s1">&#39;metric&#39;</span><span class="p">,</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+    <span class="n">validate_with_conframe</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">=</span> <span class="n">conframe</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;metric&#39;</span><span class="p">,</span><span class="s1">&#39;value&#39;</span><span class="p">),</span>
+        <span class="n">row_model</span><span class="o">=</span><span class="n">Record</span>
+    <span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span>
+    <span class="n">validate_with_columns</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+    <span class="n">validate_with_model</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+    <span class="n">validate_with_conframe</span><span class="o">=</span><span class="n">df</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">validate_with_model</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span> <span class="c1"># the `Record` Model parse input values into floats</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">validate_with_columns</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span> <span class="c1"># validating just the column names took the raw values.</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>float64
+object
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Model(validate_with_model=  metric  value not_there
+0      a    1.0      None
+1      b    2.0      None
+2      c    3.0      None, validate_with_columns=  metric value
+0      a     1
+1      b     2
+2      c     3)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Usage-with-Validate-Agruments-Decorator">Usage with Validate Agruments Decorator<a class="anchor-link" href="#Usage-with-Validate-Agruments-Decorator"> </a></h4>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">validate_arguments</span><span class="p">,</span><span class="n">Field</span>
+
+<span class="k">class</span> <span class="nc">PlayerBattingStats</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">player</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="s1">&#39;PLAYER&#39;</span><span class="p">)</span>
+    <span class="n">at_bats</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="s1">&#39;AB&#39;</span><span class="p">)</span>
+    <span class="n">games</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="s1">&#39;G&#39;</span><span class="p">)</span>
+    <span class="n">home_runs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="s1">&#39;HR&#39;</span><span class="p">)</span>
+    
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">on_error</span> <span class="o">=</span> <span class="s1">&#39;skip&#39;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@validate_arguments</span>
+<span class="k">def</span> <span class="nf">compute_hr_per_game</span><span class="p">(</span><span class="n">df</span><span class="p">:</span><span class="n">ConstrainedFrame</span><span class="p">[</span><span class="n">PlayerBattingStats</span><span class="p">],</span><span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;batting_average&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;home_runs&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;games&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">precision</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This is our raw DataFrame.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="s2">&quot;https://www.espn.com/mlb/history/leaders&quot;</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PLAYER</th>
+      <th>YRS</th>
+      <th>G</th>
+      <th>AB</th>
+      <th>R</th>
+      <th>H</th>
+      <th>2B</th>
+      <th>3B</th>
+      <th>HR</th>
+      <th>RBI</th>
+      <th>BB</th>
+      <th>SO</th>
+      <th>SB</th>
+      <th>CS</th>
+      <th>BA</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>NaN</th>
+      <td>Babe Ruth</td>
+      <td>22</td>
+      <td>2503</td>
+      <td>8399</td>
+      <td>2174</td>
+      <td>2873</td>
+      <td>506</td>
+      <td>136</td>
+      <td>714</td>
+      <td>1983</td>
+      <td>2056</td>
+      <td>1330</td>
+      <td>123</td>
+      <td>117</td>
+      <td>.342</td>
+    </tr>
+    <tr>
+      <th>NaN</th>
+      <td>PLAYER</td>
+      <td>YRS</td>
+      <td>G</td>
+      <td>AB</td>
+      <td>R</td>
+      <td>H</td>
+      <td>2B</td>
+      <td>3B</td>
+      <td>HR</td>
+      <td>RBI</td>
+      <td>BB</td>
+      <td>SO</td>
+      <td>SB</td>
+      <td>CS</td>
+      <td>BA</td>
+    </tr>
+    <tr>
+      <th>11.0</th>
+      <td>Bill Terry</td>
+      <td>14</td>
+      <td>1721</td>
+      <td>6428</td>
+      <td>1120</td>
+      <td>2193</td>
+      <td>373</td>
+      <td>112</td>
+      <td>154</td>
+      <td>1078</td>
+      <td>537</td>
+      <td>449</td>
+      <td>56</td>
+      <td>6</td>
+      <td>.341</td>
+    </tr>
+    <tr>
+      <th>NaN</th>
+      <td>Pete Browning</td>
+      <td>13</td>
+      <td>1183</td>
+      <td>4820</td>
+      <td>954</td>
+      <td>1646</td>
+      <td>295</td>
+      <td>85</td>
+      <td>46</td>
+      <td>0</td>
+      <td>466</td>
+      <td>167</td>
+      <td>258</td>
+      <td>0</td>
+      <td>.341</td>
+    </tr>
+    <tr>
+      <th>NaN</th>
+      <td>Willie Keeler</td>
+      <td>19</td>
+      <td>2123</td>
+      <td>8591</td>
+      <td>1719</td>
+      <td>2932</td>
+      <td>241</td>
+      <td>145</td>
+      <td>33</td>
+      <td>0</td>
+      <td>524</td>
+      <td>36</td>
+      <td>495</td>
+      <td>0</td>
+      <td>.341</td>
+    </tr>
+    <tr>
+      <th>14.0</th>
+      <td>Lou Gehrig</td>
+      <td>17</td>
+      <td>2164</td>
+      <td>8001</td>
+      <td>1888</td>
+      <td>2721</td>
+      <td>534</td>
+      <td>163</td>
+      <td>493</td>
+      <td>1995</td>
+      <td>1508</td>
+      <td>790</td>
+      <td>102</td>
+      <td>101</td>
+      <td>.340</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Some headers are mixed into the table and yield bad data. Those rows are removed during validation because they don't conform to the row model.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">compute_hr_per_game</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">9</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>player</th>
+      <th>at_bats</th>
+      <th>games</th>
+      <th>home_runs</th>
+      <th>batting_average</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>9</th>
+      <td>Babe Ruth</td>
+      <td>8399</td>
+      <td>2503</td>
+      <td>714</td>
+      <td>0.285</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Bill Terry</td>
+      <td>6428</td>
+      <td>1721</td>
+      <td>154</td>
+      <td>0.089</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Pete Browning</td>
+      <td>4820</td>
+      <td>1183</td>
+      <td>46</td>
+      <td>0.039</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Willie Keeler</td>
+      <td>8591</td>
+      <td>2123</td>
+      <td>33</td>
+      <td>0.016</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Lou Gehrig</td>
+      <td>8001</td>
+      <td>2164</td>
+      <td>493</td>
+      <td>0.228</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>George Sisler</td>
+      <td>8267</td>
+      <td>2055</td>
+      <td>102</td>
+      <td>0.050</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">HttpUrl</span><span class="p">,</span><span class="n">validator</span>
+
+<span class="k">class</span> <span class="nc">BattingLeaderRecord</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="s1">&#39;RK&#39;</span><span class="p">)</span>
+    <span class="n">Name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">AVG</span><span class="p">:</span> <span class="nb">float</span>
+        
+    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_remove_team_from_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">v</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;remove the last 3 letters from the name column&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">BattingAverageLeaders</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">url</span><span class="p">:</span> <span class="n">HttpUrl</span> <span class="o">=</span> <span class="s2">&quot;https://www.espn.com/mlb/stats/player/_/view/batting/table/batting/sort/avg/dir/desc&quot;</span>
+    <span class="n">raw_data</span><span class="p">:</span> <span class="n">DataFrame</span>
+    <span class="n">normalized_data</span><span class="p">:</span> <span class="n">ConstrainedFrame</span><span class="p">[</span><span class="n">BattingLeaderRecord</span><span class="p">]</span>
+    <span class="n">timestamp</span><span class="p">:</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">=</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+    <span class="p">)</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://www.espn.com/mlb/stats/player/_/view/batting/table/batting/sort/avg/dir/desc&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">raw_data</span><span class="o">=</span><span class="n">raw_data</span><span class="p">,</span>
+            <span class="n">normalized_data</span><span class="o">=</span><span class="n">raw_data</span>
+        <span class="p">)</span>
+        
+        
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">BattingAverageLeaders</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>__main__.BattingAverageLeaders</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">leaders</span> <span class="o">=</span> <span class="n">BattingAverageLeaders</span><span class="p">()</span>
+<span class="n">leaders</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>BattingAverageLeaders(url=&#39;https://www.espn.com/mlb/stats/player/_/view/batting/table/batting/sort/avg/dir/desc&#39;, raw_data=    RK                      Name POS   GP   AB    R    H    AVG  2B  3B  HR  \
+0    1        Trea TurnerLAD/WSH  SS  144  581  101  188  0.324  33   3  25   
+1    2              Juan SotoWSH  LF  148  494  110  157  0.318  20   2  29   
+2    3           Yuli GurrielHOU  1B  140  521   80  165  0.317  31   0  14   
+3    4  Vladimir Guerrero Jr.TOR  DH  157  588  120  184  0.313  27   1  46   
+4    5       Michael BrantleyHOU  LF  117  458   68  143  0.312  29   2   8   
+5    6       Nick CastellanosCIN  RF  135  523   94  162  0.310  37   1  33   
+6    7           Bryce HarperPHI  RF  137  474   99  146  0.308  40   1  34   
+7    8     Starling MarteOAK/MIA  CF  117  458   86  141  0.308  27   2  12   
+8    9        Adam FrazierPIT/SD  2B  151  566   83  174  0.307  35   5   5   
+9   10           Austin RileyATL  3B  156  577   89  174  0.302  32   1  32   
+10  11        Brandon CrawfordSF  SS  134  468   75  141  0.301  29   3  23   
+11  12             Nicky LopezKC  2B  147  485   76  146  0.301  21   6   2   
+12  13           Tim AndersonCHW  SS  120  515   92  155  0.301  28   2  17   
+13  14        Freddie FreemanATL  1B  156  591  118  177  0.299  25   2  31   
+14  15         Bryan ReynoldsPIT  LF  155  550   91  164  0.298  34   7  24   
+15  16      Teoscar HernandezTOR  RF  139  534   90  159  0.298  29   0  31   
+16  17         Cedric MullinsBAL  CF  155  586   89  174  0.297  37   5  30   
+17  18        Xander BogaertsBOS  SS  140  517   88  153  0.296  34   1  23   
+18  19            Bo BichetteTOR  SS  155  624  117  184  0.295  27   1  28   
+19  20       Paul GoldschmidtSTL  1B  155  594  101  175  0.295  35   2  31   
+20  21              Ty FranceSEA  3B  149  560   82  164  0.293  30   1  18   
+21  22            Jean SeguraPHI  SS  130  510   76  149  0.292  27   3  14   
+22  23            Kyle TuckerHOU  LF  136  492   80  143  0.291  36   3  28   
+23  24           Alex VerdugoBOS  LF  143  531   88  154  0.290  31   2  13   
+24  25          J.D. MartinezBOS  LF  144  558   90  160  0.287  41   3  28   
+25  26            Aaron JudgeNYY  RF  144  536   87  153  0.285  24   0  37   
+26  27           Amed RosarioCLE  SS  139  543   74  153  0.282  25   6  11   
+27  28      Fernando Tatis Jr.SD  SS  126  462   98  130  0.281  29   0  41   
+28  29    Lourdes Gurriel Jr.TOR  LF  139  492   61  138  0.280  28   2  21   
+29  30      Josh HarrisonOAK/WSH  2B  137  500   58  140  0.280  33   2   8   
+30  31          Tyler O&#39;NeillSTL  LF  138  472   85  132  0.280  25   1  32   
+31  32           Manny MachadoSD  3B  150  555   92  155  0.279  31   2  28   
+32  33         Whit MerrifieldKC  RF  158  646   95  180  0.279  41   3  10   
+33  34          Salvador PerezKC   C  157  606   87  168  0.277  23   0  48   
+34  35          Carlos CorreaHOU  SS  145  545  101  151  0.277  34   1  24   
+35  36              C.J. CronCOL  1B  139  462   69  128  0.277  30   1  28   
+36  37        Jonathan SchoopDET  2B  153  611   82  169  0.277  29   1  21   
+37  38         Yordan AlvarezHOU  DH  140  521   91  144  0.276  33   1  32   
+38  39          Rafael DeversBOS  3B  152  572   97  158  0.276  37   1  35   
+39  40      Giancarlo StantonNYY  DH  135  497   62  137  0.276  18   0  35   
+40  41          Justin TurnerLAD  3B  147  519   83  143  0.276  22   0  25   
+41  41            Jared WalshLAA  1B  142  519   68  143  0.276  33   1  27   
+42  43           Raimel TapiaCOL  LF  130  473   69  130  0.275  26   2   6   
+43  44            Jose AltuveHOU  2B  142  587  114  161  0.274  30   1  31   
+44  45          J.P. CrawfordSEA  SS  157  608   88  166  0.273  37   0   9   
+45  46      Jeimer CandelarioDET  3B  147  550   73  150  0.273  42   3  16   
+46  46       Andrew BenintendiKC  LF  130  484   61  132  0.273  25   2  17   
+47  48     Isiah Kiner-FalefaTEX  3B  155  624   73  170  0.272  25   3   7   
+48  49         Randy ArozarenaTB  LF  137  514   91  140  0.272  31   3  20   
+49  50             Matt OlsonOAK  1B  153  551  100  150  0.272  35   0  38   
+
+    RBI   TB   BB    K  SB    OBP    SLG    OPS  WAR  
+0    68  302   40  109  32  0.371  0.520  0.891  6.0  
+1    94  268  140   87   9  0.467  0.543  1.010  7.1  
+2    79  238   59   66   1  0.383  0.457  0.839  3.7  
+3   106  351   85  107   4  0.403  0.597  1.000  6.7  
+4    45  200   33   51   1  0.364  0.437  0.801  2.5  
+5    97  300   39  120   3  0.362  0.574  0.936  3.2  
+6    82  290   99  129  13  0.430  0.612  1.041  5.7  
+7    54  208   43   98  45  0.381  0.454  0.835  4.4  
+8    43  234   47   68  10  0.370  0.413  0.784  4.1  
+9   103  304   52  163   0  0.367  0.527  0.894  5.7  
+10   89  245   56  102  11  0.377  0.524  0.901  5.8  
+11   43  185   46   72  21  0.364  0.381  0.746  4.0  
+12   59  238   21  119  18  0.329  0.462  0.791  4.0  
+13   82  299   84  105   8  0.392  0.506  0.898  4.5  
+14   89  284   74  118   5  0.387  0.516  0.903  5.9  
+15  112  281   35  143  11  0.348  0.526  0.874  4.2  
+16   59  311   59  121  30  0.366  0.531  0.897  6.2  
+17   79  258   55  110   5  0.365  0.499  0.864  4.8  
+18  101  297   39  135  24  0.340  0.476  0.816  5.5  
+19   98  307   67  134  12  0.367  0.517  0.884  6.2  
+20   73  250   44  106   0  0.368  0.446  0.814  4.1  
+21   58  224   39   76   9  0.351  0.439  0.790  3.7  
+22   88  269   51   88  14  0.355  0.547  0.902  5.1  
+23   61  228   51   92   6  0.354  0.429  0.783  2.4  
+24   99  291   54  146   0  0.349  0.522  0.870  2.9  
+25   95  288   73  156   6  0.371  0.537  0.908  5.6  
+26   55  223   28  119  12  0.318  0.411  0.729  2.0  
+27   95  282   62  146  25  0.366  0.610  0.976  6.5  
+28   84  233   32  102   1  0.323  0.474  0.797  2.9  
+29   59  201   31   74   9  0.342  0.402  0.744  2.2  
+30   77  255   38  166  14  0.346  0.540  0.886  5.7  
+31  103  274   62  100  12  0.349  0.494  0.842  5.3  
+32   73  257   39  100  40  0.318  0.398  0.716  3.7  
+33  121  335   27  165   1  0.318  0.553  0.871  5.5  
+34   88  259   74  114   0  0.363  0.475  0.838  6.9  
+35   90  244   58  116   1  0.371  0.528  0.899  3.2  
+36   82  263   36  130   1  0.319  0.430  0.750  2.0  
+37  101  275   50  140   1  0.347  0.528  0.875  2.8  
+38  108  302   62  141   5  0.352  0.528  0.880  3.1  
+39   96  260   61  151   0  0.356  0.523  0.880  3.2  
+40   83  240   60   97   3  0.360  0.462  0.823  3.6  
+41   92  259   47  150   2  0.339  0.499  0.838  2.6  
+42   50  178   40   69  20  0.330  0.376  0.706  1.4  
+43   82  286   66   90   5  0.348  0.487  0.836  4.4  
+44   52  230   56  111   3  0.336  0.378  0.715  3.8  
+45   66  246   63  135   0  0.352  0.447  0.799  3.5  
+46   71  212   33   97   8  0.317  0.438  0.755  2.3  
+47   52  222   27   89  20  0.313  0.356  0.669  4.1  
+48   69  237   52  163  16  0.352  0.461  0.813  3.8  
+49  109  299   88  108   4  0.375  0.543  0.917  5.7  , normalized_data=    rank                   Name    AVG
+0      1        Trea TurnerLAD/  0.324
+1      2              Juan Soto  0.318
+2      3           Yuli Gurriel  0.317
+3      4  Vladimir Guerrero Jr.  0.313
+4      5       Michael Brantley  0.312
+5      6       Nick Castellanos  0.310
+6      7           Bryce Harper  0.308
+7      8     Starling MarteOAK/  0.308
+8      9        Adam FrazierPIT  0.307
+9     10           Austin Riley  0.302
+10    11        Brandon Crawfor  0.301
+11    12             Nicky Lope  0.301
+12    13           Tim Anderson  0.301
+13    14        Freddie Freeman  0.299
+14    15         Bryan Reynolds  0.298
+15    16      Teoscar Hernandez  0.298
+16    17         Cedric Mullins  0.297
+17    18        Xander Bogaerts  0.296
+18    19            Bo Bichette  0.295
+19    20       Paul Goldschmidt  0.295
+20    21              Ty France  0.293
+21    22            Jean Segura  0.292
+22    23            Kyle Tucker  0.291
+23    24           Alex Verdugo  0.290
+24    25          J.D. Martinez  0.287
+25    26            Aaron Judge  0.285
+26    27           Amed Rosario  0.282
+27    28      Fernando Tatis Jr  0.281
+28    29    Lourdes Gurriel Jr.  0.280
+29    30      Josh HarrisonOAK/  0.280
+30    31          Tyler O&#39;Neill  0.280
+31    32           Manny Machad  0.279
+32    33         Whit Merrifiel  0.279
+33    34          Salvador Pere  0.277
+34    35          Carlos Correa  0.277
+35    36              C.J. Cron  0.277
+36    37        Jonathan Schoop  0.277
+37    38         Yordan Alvarez  0.276
+38    39          Rafael Devers  0.276
+39    40      Giancarlo Stanton  0.276
+40    41          Justin Turner  0.276
+41    41            Jared Walsh  0.276
+42    43           Raimel Tapia  0.275
+43    44            Jose Altuve  0.274
+44    45          J.P. Crawford  0.273
+45    46      Jeimer Candelario  0.273
+46    46       Andrew Benintend  0.273
+47    48     Isiah Kiner-Falefa  0.272
+48    49         Randy Arozaren  0.272
+49    50             Matt Olson  0.272, timestamp=datetime.date(2021, 9, 30))</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">leaders</span><span class="o">.</span><span class="n">raw_data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="n">display</span><span class="p">(</span><span class="n">leaders</span><span class="o">.</span><span class="n">normalized_data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>RK</th>
+      <th>Name</th>
+      <th>POS</th>
+      <th>GP</th>
+      <th>AB</th>
+      <th>R</th>
+      <th>H</th>
+      <th>AVG</th>
+      <th>2B</th>
+      <th>3B</th>
+      <th>HR</th>
+      <th>RBI</th>
+      <th>TB</th>
+      <th>BB</th>
+      <th>K</th>
+      <th>SB</th>
+      <th>OBP</th>
+      <th>SLG</th>
+      <th>OPS</th>
+      <th>WAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Trea TurnerLAD/WSH</td>
+      <td>SS</td>
+      <td>144</td>
+      <td>581</td>
+      <td>101</td>
+      <td>188</td>
+      <td>0.324</td>
+      <td>33</td>
+      <td>3</td>
+      <td>25</td>
+      <td>68</td>
+      <td>302</td>
+      <td>40</td>
+      <td>109</td>
+      <td>32</td>
+      <td>0.371</td>
+      <td>0.520</td>
+      <td>0.891</td>
+      <td>6.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Juan SotoWSH</td>
+      <td>LF</td>
+      <td>148</td>
+      <td>494</td>
+      <td>110</td>
+      <td>157</td>
+      <td>0.318</td>
+      <td>20</td>
+      <td>2</td>
+      <td>29</td>
+      <td>94</td>
+      <td>268</td>
+      <td>140</td>
+      <td>87</td>
+      <td>9</td>
+      <td>0.467</td>
+      <td>0.543</td>
+      <td>1.010</td>
+      <td>7.1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Yuli GurrielHOU</td>
+      <td>1B</td>
+      <td>140</td>
+      <td>521</td>
+      <td>80</td>
+      <td>165</td>
+      <td>0.317</td>
+      <td>31</td>
+      <td>0</td>
+      <td>14</td>
+      <td>79</td>
+      <td>238</td>
+      <td>59</td>
+      <td>66</td>
+      <td>1</td>
+      <td>0.383</td>
+      <td>0.457</td>
+      <td>0.839</td>
+      <td>3.7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Vladimir Guerrero Jr.TOR</td>
+      <td>DH</td>
+      <td>157</td>
+      <td>588</td>
+      <td>120</td>
+      <td>184</td>
+      <td>0.313</td>
+      <td>27</td>
+      <td>1</td>
+      <td>46</td>
+      <td>106</td>
+      <td>351</td>
+      <td>85</td>
+      <td>107</td>
+      <td>4</td>
+      <td>0.403</td>
+      <td>0.597</td>
+      <td>1.000</td>
+      <td>6.7</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>Michael BrantleyHOU</td>
+      <td>LF</td>
+      <td>117</td>
+      <td>458</td>
+      <td>68</td>
+      <td>143</td>
+      <td>0.312</td>
+      <td>29</td>
+      <td>2</td>
+      <td>8</td>
+      <td>45</td>
+      <td>200</td>
+      <td>33</td>
+      <td>51</td>
+      <td>1</td>
+      <td>0.364</td>
+      <td>0.437</td>
+      <td>0.801</td>
+      <td>2.5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>rank</th>
+      <th>Name</th>
+      <th>AVG</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Trea TurnerLAD/</td>
+      <td>0.324</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Juan Soto</td>
+      <td>0.318</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Yuli Gurriel</td>
+      <td>0.317</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Vladimir Guerrero Jr.</td>
+      <td>0.313</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>Michael Brantley</td>
+      <td>0.312</td>
     </tr>
   </tbody>
 </table>
@@ -784,7 +2291,6 @@ In Base Frame Root validator
 <pre>Converted 00_core.ipynb.
 Converted 98_utils.ipynb.
 Converted 99_default_standard_lib.ipynb.
-Converted core.ipynb.
 Converted index.ipynb.
 </pre>
 </div>
