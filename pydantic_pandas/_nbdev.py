@@ -4,6 +4,12 @@ __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
 index = {"TypedArray": "00_core.ipynb",
          "ArrayMeta": "00_core.ipynb",
+         "ConstrainedArray": "00_core.ipynb",
+         "update_not_none": "00_core.ipynb",
+         "TypedFrame": "00_core.ipynb",
+         "FrameMeta": "00_core.ipynb",
+         "ConstrainedFrame": "00_core.ipynb",
+         "conframe": "00_core.ipynb",
          "Array": "00_core.ipynb",
          "conarray": "00_core.ipynb",
          "PandasDataFrame": "00_core.ipynb",
