@@ -8,13 +8,18 @@ index = {"DataFrame": "00_core.ipynb",
          "ArrayMeta": "00_core.ipynb",
          "ConstrainedArray": "00_core.ipynb",
          "BaseFrame": "00_core.ipynb",
-         "TypedFrame": "00_core.ipynb",
-         "FrameMeta": "00_core.ipynb",
-         "ConstrainedFrame": "00_core.ipynb",
-         "conframe": "00_core.ipynb",
-         "delegates": "98_utils.ipynb"}
+         "RowModel": "01_row_model.ipynb",
+         "parse_dataframe_records": "01_row_model.ipynb",
+         "TypedRecordFrame": "01_row_model.ipynb",
+         "RecordFrameMeta": "01_row_model.ipynb",
+         "RecordFrame": "01_row_model.ipynb",
+         "recordframe": "01_row_model.ipynb",
+         "record_model": "01_row_model.ipynb",
+         "delegates": "98_utils.ipynb",
+         "dummy_df": "98_utils.ipynb"}
 
 modules = ["core.py",
+           "row_model.py",
            "utils.py",
            "default_standard_lib.py"]
 
