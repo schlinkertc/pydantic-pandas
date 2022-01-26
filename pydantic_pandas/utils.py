@@ -6,9 +6,9 @@ __all__ = ['delegates', 'dummy_df']
 
 from hypothesis import given, strategies as st
 import pandas as pd
+import inspect
 
 # Cell
-import inspect
 
 def delegates(to=None, keep=False):
     "Decorator: replace `**kwargs` in signature with params from `to`"
@@ -29,7 +29,8 @@ def delegates(to=None, keep=False):
             sigd['kwargs'] = k
         from_f.__doc__ = f"""
         doc string from my delegate: `{to_f.__name__}`
-        --------
+
+
         {to_f.__doc__}
         """
         from_f.__signature__ = sig.replace(parameters=sigd.values())
